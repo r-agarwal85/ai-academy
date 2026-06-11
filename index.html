@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Academy 🤖</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0c0c14;--surface:#13131f;--surface2:#1a1a2e;--border:#252540;--purple:#8b5cf6;--pl:#a78bfa;--blue:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;--dim:#94a3b8;--mono:'Space Mono',monospace;--sans:'Space Grotesk',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+/* HEADER */
+header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface);flex-shrink:0;}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+header h1{font-size:1rem;font-weight:700;}
+header p{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.xp-bar-wrap{display:flex;align-items:center;gap:8px;}
+.xp-label{font-size:.7rem;color:var(--yellow);font-weight:700;font-family:var(--mono);white-space:nowrap;}
+.xp-track{width:90px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--yellow),#f97316);border-radius:3px;transition:width .5s ease;}
+.lvl-badge{padding:3px 10px;border-radius:12px;background:linear-gradient(135deg,#92400e,#b45309);font-size:.7rem;font-weight:700;color:#fef3c7;font-family:var(--mono);white-space:nowrap;}
+.online-badge{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--green);font-weight:600;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* TABS */
+.tabs{display:flex;gap:3px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 13px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-size:.78rem;font-weight:600;white-space:nowrap;font-family:var(--sans);transition:all .2s;}
+.tab:hover{color:var(--text);background:var(--surface2);}
+.tab.active{background:var(--surface2);border-color:var(--border);color:var(--pl);}
+.tab.locked{opacity:.4;cursor:not-allowed;}
+.tab .lock-ico{margin-right:4px;font-size:.7rem;}
+/* LAYOUT */
+.main{flex:1;display:flex;overflow:hidden;height:calc(100vh - 100px);}
+/* SIDEBAR */
+.sidebar{width:210px;flex-shrink:0;border-right:1px solid var(--border);background:var(--surface);overflow-y:auto;padding:10px 7px;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.slabel{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);padding:6px 8px 4px;}
+.topic-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;border-radius:7px;border:none;background:transparent;color:var(--dim);cursor:pointer;font-size:.8rem;font-family:var(--sans);text-align:left;transition:all .15s;margin-bottom:2px;}
+.topic-btn:hover{background:var(--surface2);color:var(--text);}
+.topic-btn .ticon{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
+.quick-btn{width:100%;padding:6px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:.73rem;font-family:var(--sans);text-align:left;transition:all .15s;margin-bottom:3px;}
+.quick-btn:hover{border-color:var(--purple);color:var(--pl);}
+/* VIEWS */
+.view{display:none;}
+.view.show{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+/* CHAT */
+.messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+.messages::-webkit-scrollbar{width:4px;}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.msg{display:flex;gap:9px;max-width:720px;}
+.msg.user{flex-direction:row-reverse;margin-left:auto;}
+.avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;margin-top:2px;}
+.avatar.ai{background:linear-gradient(135deg,var(--purple),var(--blue));}
+.avatar.user{background:var(--surface2);border:1px solid var(--border);}
+.bubble{padding:10px 14px;border-radius:11px;font-size:.85rem;line-height:1.6;max-width:580px;}
+.msg.ai .bubble{background:var(--surface2);border:1px solid var(--border);border-top-left-radius:3px;color:var(--text);}
+.msg.user .bubble{background:linear-gradient(135deg,#4c1d95,#1e3a8a);border:1px solid #6d28d9;border-top-right-radius:3px;color:#ddd6fe;}
+.bubble strong{color:var(--pl);}
+.bubble code{background:#0f0f1a;padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:.8rem;color:var(--green);}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:10px 14px;}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:bounce 1.2s infinite;}
+.typing-indicator span:nth-child(2){animation-delay:.2s;}
+.typing-indicator span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.input-bar{padding:12px 18px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:9px;align-items:flex-end;flex-shrink:0;}
+textarea{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--sans);font-size:.85rem;padding:9px 13px;resize:none;outline:none;line-height:1.5;max-height:110px;transition:border-color .2s;}
+textarea:focus{border-color:var(--purple);}
+textarea::placeholder{color:var(--muted);}
+.send-btn{width:38px;height:38px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:white;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .2s;}
+.send-btn:hover{opacity:.85;}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;}
+/* WELCOME */
+.welcome{text-align:center;padding:30px 16px;max-width:480px;margin:0 auto;}
+.welcome .big-icon{font-size:2.8rem;margin-bottom:12px;}
+.welcome h2{font-size:1.3rem;color:var(--text);margin-bottom:7px;}
+.welcome p{font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.starter{padding:11px 13px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--dim);cursor:pointer;font-size:.77rem;font-family:var(--sans);text-align:left;transition:all .2s;line-height:1.4;}
+.starter:hover{border-color:var(--purple);color:var(--pl);}
+.starter .sico{font-size:1rem;display:block;margin-bottom:3px;}
+/* PANEL */
+.panel-content{flex:1;overflow-y:auto;padding:18px 22px;}
+.panel-content::-webkit-scrollbar{width:4px;}
+.panel-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.panel-header{margin-bottom:16px;}
+.panel-header h2{font-size:1.05rem;color:var(--text);margin-bottom:3px;}
+.panel-header p{font-size:.8rem;color:var(--muted);}
+/* CONCEPTS */
+.concepts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.ccard{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:14px;cursor:pointer;transition:all .2s;}
+.ccard:hover{border-color:var(--purple);transform:translateY(-2px);}
+.ccard .cico{font-size:1.6rem;margin-bottom:7px;}
+.ccard h3{font-size:.88rem;color:var(--text);margin-bottom:4px;}
+.ccard p{font-size:.75rem;color:var(--muted);line-height:1.4;}
+.cdetail{background:var(--surface2);border:1px solid var(--purple);border-radius:13px;padding:18px;margin-top:12px;display:none;}
+.cdetail h2{font-size:.98rem;color:var(--pl);margin-bottom:9px;}
+.cdetail p{font-size:.83rem;color:var(--dim);line-height:1.55;margin-bottom:6px;}
+.analogy{background:var(--bg);border-left:3px solid var(--blue);padding:9px 13px;border-radius:0 7px 7px 0;font-size:.8rem;color:#93c5fd;margin-top:7px;}
+.close-btn{margin-top:10px;padding:5px 13px;border-radius:7px;background:var(--border);border:none;color:var(--muted);cursor:pointer;font-size:.78rem;font-family:var(--sans);transition:all .15s;}
+.close-btn:hover{background:var(--surface2);color:var(--text);}
+/* QUIZ */
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin:10px 0;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:2px;transition:width .4s ease;}
+.score-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:18px;background:var(--surface2);border:1px solid var(--border);font-size:.82rem;font-weight:700;color:var(--pl);font-family:var(--mono);}
+.qcard{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:18px;margin-bottom:12px;}
+.qcard .qtag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--pl);font-family:var(--mono);margin-bottom:7px;}
+.qcard h3{font-size:.92rem;color:var(--text);line-height:1.5;margin-bottom:12px;}
+.qopts{display:grid;gap:6px;}
+.qopt{padding:9px 13px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--dim);cursor:pointer;font-size:.82rem;font-family:var(--sans);text-align:left;transition:all .2s;}
+.qopt:hover:not(:disabled){border-color:var(--blue);color:var(--text);}
+.qopt.correct{border-color:var(--green);background:#064e3b33;color:var(--green);}
+.qopt.wrong{border-color:var(--red);background:#7f1d1d33;color:var(--red);}
+.qexp{margin-top:9px;padding:9px 13px;border-radius:8px;background:var(--bg);border-left:3px solid var(--pl);font-size:.8rem;color:var(--dim);line-height:1.5;display:none;}
+/* GLOSSARY */
+.gloss-search{width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--sans);font-size:.85rem;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.gloss-search:focus{border-color:var(--purple);}
+.term{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:12px 15px;margin-bottom:7px;}
+.term h4{color:var(--pl);font-size:.86rem;margin-bottom:3px;}
+.term p{color:var(--muted);font-size:.78rem;line-height:1.4;}
+.ttag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.64rem;background:#1e3a5f;color:var(--blue);margin-left:6px;font-weight:700;}
+
+/* ===== GAME ===== */
+.game-wrap{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.game-top{display:flex;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);overflow-x:auto;}
+.game-top::-webkit-scrollbar{display:none;}
+.stage-chip{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;border:2px solid var(--border);background:transparent;cursor:pointer;font-size:.78rem;font-family:var(--sans);color:var(--muted);transition:all .2s;white-space:nowrap;position:relative;}
+.stage-chip.active{border-color:var(--purple);color:var(--pl);background:var(--surface2);}
+.stage-chip.done{border-color:var(--green);color:var(--green);}
+.stage-chip.locked-stage{opacity:.45;cursor:not-allowed;}
+.stage-chip .chip-ico{font-size:1rem;}
+.stage-chip .chip-stars{font-size:.65rem;letter-spacing:1px;}
+.game-body{flex:1;overflow-y:auto;padding:18px 22px;}
+.game-body::-webkit-scrollbar{width:4px;}
+.game-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.stage-header{margin-bottom:16px;}
+.stage-header h2{font-size:1.1rem;color:var(--text);}
+.stage-header p{font-size:.82rem;color:var(--muted);margin-top:3px;}
+.stage-locked-msg{text-align:center;padding:50px 20px;color:var(--muted);}
+.stage-locked-msg .lock-big{font-size:3rem;margin-bottom:12px;}
+.stage-locked-msg h3{font-size:1rem;color:var(--dim);margin-bottom:6px;}
+.stage-locked-msg p{font-size:.82rem;}
+/* challenge cards */
+.challenge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:20px;}
+.chall-card{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:16px;cursor:pointer;transition:all .2s;position:relative;}
+.chall-card:hover:not(.done-card){border-color:var(--purple);transform:translateY(-2px);}
+.chall-card.done-card{border-color:#064e3b;background:#0a2018;}
+.chall-card .ch-type{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.ch-type.quiz-t{color:#60a5fa;}
+.ch-type.prompt-t{color:#c084fc;}
+.ch-type.design-t{color:#34d399;}
+.chall-card h3{font-size:.88rem;color:var(--text);margin-bottom:5px;line-height:1.4;}
+.chall-card p{font-size:.76rem;color:var(--muted);line-height:1.4;}
+.ch-xp{position:absolute;top:12px;right:12px;font-size:.68rem;font-weight:700;color:var(--yellow);font-family:var(--mono);}
+.ch-done-badge{position:absolute;top:10px;right:10px;background:#064e3b;color:var(--green);font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;}
+/* challenge modal */
+.ch-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.ch-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;padding:22px;}
+.ch-modal::-webkit-scrollbar{width:4px;}
+.ch-modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.ch-modal h2{font-size:1rem;color:var(--text);margin-bottom:5px;}
+.ch-modal .ch-desc{font-size:.82rem;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+.modal-close{float:right;background:var(--border);border:none;color:var(--muted);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.78rem;font-family:var(--sans);}
+.modal-close:hover{color:var(--text);}
+/* quiz challenge */
+.cq-opt{display:block;width:100%;padding:9px 13px;margin:5px 0;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--dim);cursor:pointer;font-size:.83rem;font-family:var(--sans);text-align:left;transition:all .2s;}
+.cq-opt:hover:not(:disabled){border-color:var(--blue);color:var(--text);}
+.cq-opt.cq-correct{border-color:var(--green);background:#064e3b33;color:var(--green);}
+.cq-opt.cq-wrong{border-color:var(--red);background:#7f1d1d33;color:var(--red);}
+.cq-feedback{padding:10px 13px;border-radius:8px;margin-top:10px;font-size:.82rem;line-height:1.5;border-left:3px solid var(--pl);background:var(--bg);color:var(--dim);display:none;}
+/* prompt challenge */
+.prompt-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--sans);font-size:.83rem;padding:10px 13px;resize:none;outline:none;line-height:1.5;transition:border-color .2s;margin-bottom:10px;}
+.prompt-input:focus{border-color:var(--purple);}
+.eval-btn{padding:9px 20px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;cursor:pointer;font-size:.83rem;font-family:var(--sans);font-weight:600;transition:opacity .2s;}
+.eval-btn:hover{opacity:.85;}
+.eval-btn:disabled{opacity:.4;cursor:not-allowed;}
+.eval-result{margin-top:12px;padding:13px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:.82rem;color:var(--dim);line-height:1.6;display:none;}
+.eval-result strong{color:var(--pl);}
+.score-ring{display:inline-block;padding:4px 12px;border-radius:12px;font-weight:700;font-family:var(--mono);font-size:.85rem;margin-bottom:8px;}
+.score-great{background:#064e3b33;color:var(--green);border:1px solid var(--green);}
+.score-ok{background:#78350f33;color:var(--yellow);border:1px solid var(--yellow);}
+.score-low{background:#7f1d1d33;color:var(--red);border:1px solid var(--red);}
+/* achievements */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:16px;}
+.ach-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:all .2s;}
+.ach-card.earned{border-color:var(--yellow);background:linear-gradient(135deg,#1c1206,#1a1a2e);}
+.ach-card.locked-ach{opacity:.45;filter:grayscale(1);}
+.ach-card .ach-ico{font-size:1.8rem;margin-bottom:6px;}
+.ach-card h4{font-size:.8rem;color:var(--text);margin-bottom:3px;}
+.ach-card p{font-size:.72rem;color:var(--muted);}
+.ach-card .ach-earned-tag{font-size:.65rem;color:var(--yellow);font-weight:700;margin-top:4px;}
+/* XP popup */
+.xp-popup{position:fixed;top:70px;right:20px;background:linear-gradient(135deg,#92400e,#b45309);color:#fef3c7;padding:8px 16px;border-radius:20px;font-size:.82rem;font-weight:700;font-family:var(--mono);z-index:200;animation:popIn .4s ease,fadeOut .4s 1.6s forwards;pointer-events:none;}
+@keyframes popIn{from{transform:translateY(-10px) scale(.9);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(-8px)}}
+/* achievement toast */
+.ach-toast{position:fixed;bottom:24px;right:20px;background:var(--surface);border:1px solid var(--yellow);border-radius:13px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:200;animation:slideIn .4s ease,slideOut .4s 2.6s forwards;max-width:260px;}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{to{transform:translateX(120%);opacity:0}}
+.ach-toast .tico{font-size:1.5rem;}
+.ach-toast .ttitle{font-size:.78rem;font-weight:700;color:var(--yellow);}
+.ach-toast .tdesc{font-size:.7rem;color:var(--muted);}
+/* PROMPT ENG TAB */
+.pe-section{margin-bottom:24px;}
+.pe-section h3{font-size:.92rem;color:var(--pl);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.pe-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:9px;}
+.pe-card h4{font-size:.83rem;color:var(--text);margin-bottom:5px;}
+.pe-card p{font-size:.78rem;color:var(--muted);line-height:1.5;}
+.pe-example{background:var(--bg);border-radius:8px;padding:10px 13px;margin-top:8px;}
+.pe-bad{border-left:3px solid var(--red);}
+.pe-good{border-left:3px solid var(--green);}
+.pe-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.pe-bad .pe-label{color:var(--red);}
+.pe-good .pe-label{color:var(--green);}
+.pe-example p{font-size:.8rem;color:var(--dim);font-family:var(--mono);}
+.pe-try-btn{margin-top:10px;padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;font-size:.76rem;font-family:var(--sans);transition:all .2s;}
+.pe-try-btn:hover{border-color:var(--purple);color:var(--pl);}
+.pe-playground{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:16px;}
+.pe-playground h3{font-size:.9rem;color:var(--text);margin-bottom:12px;}
+.template-btns{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.tpl-btn{padding:6px 13px;border-radius:18px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:.75rem;font-family:var(--sans);transition:all .2s;}
+.tpl-btn:hover,.tpl-btn.on{border-color:var(--purple);color:var(--pl);background:var(--surface2);}
+.pe-input-area{display:flex;gap:8px;align-items:flex-end;}
+.pe-input-area textarea{flex:1;}
+.pe-send-btn{width:36px;height:36px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:opacity .2s;}
+.pe-send-btn:hover{opacity:.85;}
+.pe-send-btn:disabled{opacity:.4;cursor:not-allowed;}
+.pe-response{margin-top:12px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:.82rem;color:var(--dim);line-height:1.6;display:none;min-height:60px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤖</div>
+  <div>
+    <h1>AI Academy</h1>
+    <p>Powered by Claude</p>
+  </div>
+  <div class="hright">
+    <div class="xp-bar-wrap">
+      <div class="xp-label" id="xp-text">0 XP</div>
+      <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+      <div class="lvl-badge" id="lvl-badge">Lvl 1</div>
+    </div>
+    <div class="online-badge"><div class="dot"></div>Claude</div>
+  </div>
+</header>
+
+<div class="tabs" id="main-tabs">
+  <button class="tab active" data-view="chat">💬 AI Tutor</button>
+  <button class="tab" data-view="concepts">🧠 Concepts</button>
+  <button class="tab" data-view="quiz">🎯 Quiz</button>
+  <button class="tab" data-view="prompts">✍️ Prompts</button>
+  <button class="tab" data-view="game">🎮 Quest</button>
+  <button class="tab" data-view="glossary">📖 Glossary</button>
+  <button class="tab" data-view="achievements">🏆 Badges</button>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="slabel">Topics</div>
+    <button class="topic-btn" onclick="askTopic('What is Artificial Intelligence? Explain it like I am in 8th grade with a fun example.')"><span class="ticon">🤖</span> What is AI?</button>
+    <button class="topic-btn" onclick="askTopic('Explain Machine Learning to me. Use a simple analogy a middle schooler would get.')"><span class="ticon">📈</span> Machine Learning</button>
+    <button class="topic-btn" onclick="askTopic('How do Neural Networks work? Explain for a middle schooler with a cool analogy.')"><span class="ticon">🕸️</span> Neural Networks</button>
+    <button class="topic-btn" onclick="askTopic('What is Natural Language Processing? Show me examples I use every day.')"><span class="ticon">💬</span> NLP</button>
+    <button class="topic-btn" onclick="askTopic('How does Computer Vision work? Give simple explanation and real examples.')"><span class="ticon">👁️</span> Computer Vision</button>
+    <button class="topic-btn" onclick="askTopic('What is Reinforcement Learning? Explain with a video game analogy.')"><span class="ticon">🎮</span> Reinforcement Learning</button>
+    <button class="topic-btn" onclick="askTopic('What are Large Language Models? How do ChatGPT and Claude actually work?')"><span class="ticon">🧬</span> LLMs</button>
+    <button class="topic-btn" onclick="askTopic('What is AI Ethics and why does it matter? Give real-world examples.')"><span class="ticon">⚖️</span> AI Ethics</button>
+    <button class="topic-btn" onclick="askTopic('What is Generative AI? How does AI create images, music, and text?')"><span class="ticon">🎨</span> Generative AI</button>
+    <button class="topic-btn" onclick="askTopic('What is prompt engineering and why is it an important skill to learn?')"><span class="ticon">✍️</span> Prompt Engineering</button>
+    <div class="slabel" style="padding-top:12px;">Quick Actions</div>
+    <button class="quick-btn" onclick="askTopic('Give me one mind-blowing AI fact — something that would totally surprise an 8th grader.')">🤯 Surprise me!</button>
+    <button class="quick-btn" onclick="askTopic('Quiz me! Give me one multiple choice AI question and wait for my answer.')">🎯 Quiz me</button>
+    <button class="quick-btn" onclick="askTopic('What cool AI projects can I build as an 8th grader with no experience?')">🛠️ Build something</button>
+    <button class="quick-btn" onclick="askTopic('What are the best AI careers for someone who starts learning now? What skills do I need?')">🚀 AI Careers</button>
+    <button class="quick-btn" onclick="askTopic('Explain the difference between AI, Machine Learning, and Deep Learning. Use a simple diagram in text.')">📊 AI vs ML vs DL</button>
+    <button class="quick-btn" onclick="askTopic('How is AI used in video games? Give me examples from popular games.')">🕹️ AI in Games</button>
+  </div>
+
+  <!-- CHAT VIEW -->
+  <div class="view show" id="view-chat">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome-screen">
+        <div class="big-icon">⚛️</div>
+        <h2>Hey! I'm Atom, your AI Tutor</h2>
+        <p>Ask me anything about AI — from how TikTok reads your mind to how self-driving cars see. No question is too simple!</p>
+        <div class="starter-grid">
+          <button class="starter" onclick="askTopic('What actually IS artificial intelligence? Explain like I am 13 years old with a fun real example.')"><span class="sico">🤖</span>What actually is AI?</button>
+          <button class="starter" onclick="askTopic('How does TikTok know exactly which videos I want to watch? Is that AI?')"><span class="sico">📱</span>How does TikTok know me?</button>
+          <button class="starter" onclick="askTopic('Can AI be wrong or biased? Give me a real example where AI made a bad decision.')"><span class="sico">⚖️</span>Can AI be wrong?</button>
+          <button class="starter" onclick="askTopic('How do chatbots like you actually work? What is happening behind the scenes?')"><span class="sico">💬</span>How do chatbots work?</button>
+          <button class="starter" onclick="askTopic('What is prompt engineering? Why is it a hot skill right now?')"><span class="sico">✍️</span>What is prompt engineering?</button>
+          <button class="starter" onclick="askTopic('How does AI generate images? What is Stable Diffusion or DALL-E actually doing?')"><span class="sico">🎨</span>How does AI make art?</button>
+        </div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <textarea id="input" rows="1" placeholder="Ask anything about AI..." onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- CONCEPTS VIEW -->
+  <div class="view" id="view-concepts">
+    <div class="panel-content">
+      <div class="panel-header"><h2>🧠 Core AI Concepts</h2><p>Tap any card to expand with a real-world analogy.</p></div>
+      <div class="concepts-grid">
+        <div class="ccard" onclick="expandConcept('ai')"><div class="cico">🤖</div><h3>What is AI?</h3><p>Machines that learn, think, and make decisions</p></div>
+        <div class="ccard" onclick="expandConcept('ml')"><div class="cico">📈</div><h3>Machine Learning</h3><p>Teaching computers by showing examples</p></div>
+        <div class="ccard" onclick="expandConcept('nn')"><div class="cico">🕸️</div><h3>Neural Networks</h3><p>AI architecture inspired by your brain</p></div>
+        <div class="ccard" onclick="expandConcept('nlp')"><div class="cico">💬</div><h3>NLP</h3><p>How AI reads and writes human language</p></div>
+        <div class="ccard" onclick="expandConcept('cv')"><div class="cico">👁️</div><h3>Computer Vision</h3><p>Teaching machines to see images</p></div>
+        <div class="ccard" onclick="expandConcept('rl')"><div class="cico">🎮</div><h3>Reinforcement Learning</h3><p>AI that learns by playing and rewards</p></div>
+        <div class="ccard" onclick="expandConcept('ethics')"><div class="cico">⚖️</div><h3>AI Ethics</h3><p>Making AI fair, safe, and honest</p></div>
+        <div class="ccard" onclick="expandConcept('llm')"><div class="cico">🧬</div><h3>Large Language Models</h3><p>The tech behind ChatGPT and Claude</p></div>
+        <div class="ccard" onclick="expandConcept('gen')"><div class="cico">🎨</div><h3>Generative AI</h3><p>AI that creates images, music, and text</p></div>
+        <div class="ccard" onclick="expandConcept('pe')"><div class="cico">✍️</div><h3>Prompt Engineering</h3><p>The art of talking to AI effectively</p></div>
+      </div>
+      <div class="cdetail" id="cdetail"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div class="view" id="view-quiz">
+    <div class="panel-content">
+      <div class="panel-header">
+        <h2>🎯 Test Your Knowledge</h2>
+        <p>Answer all questions — earn XP for correct answers!</p>
+        <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+        <div class="score-badge" id="scorebadge">0 / 0 correct</div>
+      </div>
+      <div id="quiz-questions"></div>
+    </div>
+  </div>
+
+  <!-- PROMPT ENGINEERING VIEW -->
+  <div class="view" id="view-prompts">
+    <div class="panel-content">
+      <div class="panel-header"><h2>✍️ Prompt Engineering</h2><p>Learn to talk to AI like a pro — it is one of the hottest skills of 2024!</p></div>
+
+      <div class="pe-section">
+        <h3>📖 What is Prompt Engineering?</h3>
+        <div class="pe-card">
+          <h4>The skill of talking to AI</h4>
+          <p>A <strong>prompt</strong> is what you type into an AI. Prompt engineering is the art of writing prompts that get you amazing, useful results — instead of boring or wrong ones. Think of it like learning a superpower: the same AI gives completely different answers depending on how you ask!</p>
+        </div>
+      </div>
+
+      <div class="pe-section">
+        <h3>⚡ The 5 Golden Rules</h3>
+        <div class="pe-card">
+          <h4>Rule 1: Be Specific</h4>
+          <p>Vague questions get vague answers. The more detail you give, the better.</p>
+          <div class="pe-example pe-bad"><div class="pe-label">❌ Weak Prompt</div><p>Tell me about space.</p></div>
+          <div class="pe-example pe-good"><div class="pe-label">✅ Strong Prompt</div><p>Explain how black holes form in 3 bullet points. Use an analogy a 13-year-old would understand.</p></div>
+          <button class="pe-try-btn" onclick="peLoad('Explain how black holes form in 3 bullet points. Use an analogy a 13-year-old would understand.')">▶ Try this prompt</button>
+        </div>
+        <div class="pe-card">
+          <h4>Rule 2: Give it a Role</h4>
+          <p>Tell the AI who to be. "Act as a..." changes everything about tone, depth, and style.</p>
+          <div class="pe-example pe-bad"><div class="pe-label">❌ Weak Prompt</div><p>Explain photosynthesis.</p></div>
+          <div class="pe-example pe-good"><div class="pe-label">✅ Strong Prompt</div><p>You are an enthusiastic science teacher. Explain photosynthesis to a 13-year-old student who loves video games. Use gaming analogies.</p></div>
+          <button class="pe-try-btn" onclick="peLoad('You are an enthusiastic science teacher. Explain photosynthesis to a 13-year-old student who loves video games. Use gaming analogies.')">▶ Try this prompt</button>
+        </div>
+        <div class="pe-card">
+          <h4>Rule 3: Specify the Format</h4>
+          <p>Tell AI exactly how you want the output — bullet points, a story, a table, a poem, step-by-step.</p>
+          <div class="pe-example pe-bad"><div class="pe-label">❌ Weak Prompt</div><p>What should I study for my math test?</p></div>
+          <div class="pe-example pe-good"><div class="pe-label">✅ Strong Prompt</div><p>Create a 7-day study schedule for a middle school math test on fractions and decimals. Format it as a table with: Day | Topic | Time (mins) | Practice activity.</p></div>
+          <button class="pe-try-btn" onclick="peLoad('Create a 7-day study schedule for a middle school math test on fractions and decimals. Format it as a table with: Day | Topic | Time (mins) | Practice activity.')">▶ Try this prompt</button>
+        </div>
+        <div class="pe-card">
+          <h4>Rule 4: Give Examples (Few-Shot)</h4>
+          <p>Show the AI a sample of what you want, then ask it to do more like that.</p>
+          <div class="pe-example pe-bad"><div class="pe-label">❌ Weak Prompt</div><p>Write a fun AI fact.</p></div>
+          <div class="pe-example pe-good"><div class="pe-label">✅ Strong Prompt</div><p>Here is an example of the style I want: "Netflix's AI watches your eyes to see when you pause — and learns your taste from that!" Write 3 more wild AI facts in exactly this style: one sentence, starts with the company name, ends with an exclamation.</p></div>
+          <button class="pe-try-btn" onclick="peLoad('Here is an example of the style I want: \"Netflix\'s AI watches your eyes to see when you pause — and learns your taste from that!\" Write 3 more wild AI facts in exactly this style: one sentence, starts with the company name, ends with an exclamation.')">▶ Try this prompt</button>
+        </div>
+        <div class="pe-card">
+          <h4>Rule 5: Use Chain-of-Thought</h4>
+          <p>Add "think step by step" or "explain your reasoning" — it makes AI smarter and more accurate.</p>
+          <div class="pe-example pe-bad"><div class="pe-label">❌ Weak Prompt</div><p>Is it better to study in the morning or at night?</p></div>
+          <div class="pe-example pe-good"><div class="pe-label">✅ Strong Prompt</div><p>Think step by step: Is it better for a middle schooler to study in the morning or at night? Consider: memory science, sleep, focus, and school schedules. Then give a final recommendation with 2 action tips.</p></div>
+          <button class="pe-try-btn" onclick="peLoad('Think step by step: Is it better for a middle schooler to study in the morning or at night? Consider: memory science, sleep, focus, and school schedules. Then give a final recommendation with 2 action tips.')">▶ Try this prompt</button>
+        </div>
+      </div>
+
+      <div class="pe-section">
+        <h3>🚀 Advanced Techniques</h3>
+        <div class="pe-card">
+          <h4>Zero-Shot vs Few-Shot Prompting</h4>
+          <p><strong>Zero-shot:</strong> Just ask, no examples. Works for simple tasks.<br><strong>Few-shot:</strong> Give 2-3 examples first, then ask. Way better for creative or specific tasks.</p>
+        </div>
+        <div class="pe-card">
+          <h4>Temperature & Tone Control</h4>
+          <p>Words like "be creative and unexpected" or "be precise and factual" literally change how the AI thinks. You are controlling its "temperature" — how wild vs. careful it is.</p>
+        </div>
+        <div class="pe-card">
+          <h4>Constraint Prompting</h4>
+          <p>Add rules and limits to force better outputs: "in exactly 3 sentences", "only use words a 10-year-old knows", "no bullet points", "under 100 words".</p>
+          <div class="pe-example pe-good"><div class="pe-label">✅ Example</div><p>Explain how WiFi works. Rules: exactly 3 sentences, no technical jargon, must include one funny analogy.</p></div>
+          <button class="pe-try-btn" onclick="peLoad('Explain how WiFi works. Rules: exactly 3 sentences, no technical jargon, must include one funny analogy.')">▶ Try this prompt</button>
+        </div>
+        <div class="pe-card">
+          <h4>Iterative Prompting</h4>
+          <p>Great prompts are not written once — you refine them! After each reply, say "make it more funny", "shorter", "add an example", "explain the 3rd point more." The back-and-forth IS the skill.</p>
+        </div>
+      </div>
+
+      <div class="pe-playground">
+        <h3>🎮 Prompt Playground — Try it Live</h3>
+        <div class="template-btns" id="tpl-btns">
+          <button class="tpl-btn on" onclick="selectTpl(this,'')">✏️ Write your own</button>
+          <button class="tpl-btn" onclick="selectTpl(this,'Act as a Minecraft NPC who is secretly an AI researcher. In character, explain what machine learning is in 4 sentences.')">🎮 Gaming angle</button>
+          <button class="tpl-btn" onclick="selectTpl(this,'You are a food critic. Compare supervised learning and unsupervised learning like they are two different cooking styles. Be funny.')">🍕 Food analogy</button>
+          <button class="tpl-btn" onclick="selectTpl(this,'Explain neural networks using only a story about a group of friends trying to guess a mystery song. Make it vivid and fun.')">📖 Storytelling</button>
+          <button class="tpl-btn" onclick="selectTpl(this,'Create a rap verse (4 lines, rhyming AABB) that explains what AI ethics means. Keep it school-appropriate.')">🎵 Rap battle</button>
+          <button class="tpl-btn" onclick="selectTpl(this,'Pretend you are an AI from the year 2075 looking back at 2024. What were the 3 most important AI breakthroughs of our era? Be specific.')">🔮 Future AI</button>
+        </div>
+        <div class="pe-input-area">
+          <textarea id="pe-input" rows="3" placeholder="Write or pick a prompt template above, then hit send..." oninput="autoGrow(this)"></textarea>
+          <button class="pe-send-btn" id="pe-send-btn" onclick="sendPePrompt()">➤</button>
+        </div>
+        <div class="pe-response" id="pe-response"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUEST / GAME VIEW -->
+  <div class="view" id="view-game">
+    <div class="game-wrap">
+      <div class="game-top" id="stage-chips"></div>
+      <div class="game-body" id="game-body"></div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY VIEW -->
+  <div class="view" id="view-glossary">
+    <div class="panel-content">
+      <div class="panel-header"><h2>📖 AI Glossary</h2><p>Every term you need to sound like an AI expert.</p></div>
+      <input class="gloss-search" id="gsrch" placeholder="🔍 Search terms..." oninput="filterGloss()">
+      <div id="glist"></div>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS VIEW -->
+  <div class="view" id="view-achievements">
+    <div class="panel-content">
+      <div class="panel-header">
+        <h2>🏆 Your Badges</h2>
+        <p id="ach-summary">Earn badges by completing quests, answering questions, and exploring.</p>
+      </div>
+      <div class="ach-grid" id="ach-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Challenge Modal -->
+<div class="ch-modal-overlay" id="ch-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="ch-modal" id="ch-modal"></div>
+</div>
+
+<script>
+// ==================== XP & LEVELS ====================
+let xp = 0, level = 1;
+const XP_PER_LEVEL = [0,100,250,450,700,1000,1400,1900,2500,3200,4000];
+const LEVEL_NAMES = ['Rookie','Explorer','Learner','Thinker','Coder','Architect','Researcher','Engineer','Innovator','Visionary','AI Master'];
+
+function addXP(amount, label) {
+  xp += amount;
+  updateXPBar();
+  showXPPopup('+'+amount+' XP — '+label);
+  checkLevelUp();
+  checkAchievements();
+  saveProgress();
+}
+
+function updateXPBar() {
+  const nextThresh = XP_PER_LEVEL[Math.min(level, XP_PER_LEVEL.length-1)];
+  const prevThresh = XP_PER_LEVEL[Math.max(level-1,0)];
+  const pct = nextThresh > prevThresh ? Math.min(100, ((xp - prevThresh)/(nextThresh - prevThresh))*100) : 100;
+  document.getElementById('xp-fill').style.width = pct + '%';
+  document.getElementById('xp-text').textContent = xp + ' XP';
+  document.getElementById('lvl-badge').textContent = 'Lvl ' + level + ' · ' + LEVEL_NAMES[Math.min(level-1, LEVEL_NAMES.length-1)];
+}
+
+function checkLevelUp() {
+  while (level < XP_PER_LEVEL.length && xp >= XP_PER_LEVEL[level]) {
+    level++;
+    showAchToast('🎉 Level Up!', 'You are now Level ' + level + ' — ' + LEVEL_NAMES[Math.min(level-1, LEVEL_NAMES.length-1)] + '!');
+    unlockStageForLevel();
+  }
+}
+
+function unlockStageForLevel() {
+  buildStageChips();
+}
+
+function showXPPopup(msg) {
+  const p = document.createElement('div');
+  p.className = 'xp-popup'; p.textContent = msg;
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 2100);
+}
+
+function showAchToast(title, desc) {
+  const t = document.createElement('div');
+  t.className = 'ach-toast';
+  t.innerHTML = `<div class="tico">🏅</div><div><div class="ttitle">${title}</div><div class="tdesc">${desc}</div></div>`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3100);
+}
+
+// ==================== ACHIEVEMENTS ====================
+const ACHIEVEMENTS = [
+  {id:'first_chat', ico:'💬', name:'First Contact', desc:'Send your first message to Atom', secret:false},
+  {id:'curious', ico:'🔍', name:'Curious Mind', desc:'Ask 5 different questions', secret:false},
+  {id:'quiz_start', ico:'📝', name:'Quiz Starter', desc:'Answer your first quiz question', secret:false},
+  {id:'quiz_perfect', ico:'⭐', name:'Perfect Score', desc:'Get all quiz questions right', secret:false},
+  {id:'concept_all', ico:'🧠', name:'Concept Master', desc:'Read all 10 concept cards', secret:false},
+  {id:'prompt_first', ico:'✍️', name:'Prompt Padawan', desc:'Send your first prompt in the Playground', secret:false},
+  {id:'prompt_master', ico:'🧙', name:'Prompt Wizard', desc:'Try all 5 prompt templates', secret:false},
+  {id:'stage1_clear', ico:'🌟', name:'Stage 1 Clear', desc:'Complete all Stage 1 quests', secret:false},
+  {id:'stage2_clear', ico:'🌟🌟', name:'Stage 2 Clear', desc:'Complete all Stage 2 quests', secret:false},
+  {id:'stage3_clear', ico:'🌟🌟🌟', name:'Stage 3 Clear', desc:'Complete all Stage 3 quests', secret:false},
+  {id:'stage4_clear', ico:'💎', name:'Stage 4 Clear', desc:'Complete all Stage 4 quests', secret:false},
+  {id:'stage5_clear', ico:'👑', name:'AI Champion', desc:'Complete all 5 stages!', secret:false},
+  {id:'xp500', ico:'⚡', name:'XP Surge', desc:'Earn 500 total XP', secret:false},
+  {id:'xp1000', ico:'💥', name:'XP Explosion', desc:'Earn 1000 total XP', secret:false},
+  {id:'night_owl', ico:'🦉', name:'Night Owl', desc:'Secret: discovered by exploring', secret:true},
+  {id:'speed_quiz', ico:'⚡', name:'Speed Demon', desc:'Secret: answer 3 quiz questions fast', secret:true},
+];
+let earnedAchs = new Set();
+let achProgress = { chat_count:0, concept_opens:new Set(), tpl_used:new Set(), quiz_correct:0, quiz_answered:0 };
+
+function checkAchievements() {
+  const tryEarn = (id) => {
+    if (!earnedAchs.has(id)) {
+      earnedAchs.add(id);
+      const a = ACHIEVEMENTS.find(x=>x.id===id);
+      if (a) showAchToast(a.ico+' '+a.name, a.desc);
+      renderAchs(); saveProgress();
+    }
+  };
+  if (achProgress.chat_count >= 1) tryEarn('first_chat');
+  if (achProgress.chat_count >= 5) tryEarn('curious');
+  if (achProgress.quiz_answered >= 1) tryEarn('quiz_start');
+  if (achProgress.quiz_correct >= 10 && achProgress.quiz_answered >= 10) tryEarn('quiz_perfect');
+  if (achProgress.concept_opens.size >= 10) tryEarn('concept_all');
+  if (achProgress.tpl_used.size >= 1) tryEarn('prompt_first');
+  if (achProgress.tpl_used.size >= 5) tryEarn('prompt_master');
+  if (xp >= 500) tryEarn('xp500');
+  if (xp >= 1000) tryEarn('xp1000');
+  checkStageClearAchs();
+}
+
+function checkStageClearAchs() {
+  for (let s=1; s<=5; s++) {
+    const stage = STAGES[s-1];
+    const allDone = stage.challenges.every(c => completedChallenges.has(c.id));
+    if (allDone) {
+      const id = 'stage'+s+'_clear';
+      if (!earnedAchs.has(id)) {
+        earnedAchs.add(id);
+        const a = ACHIEVEMENTS.find(x=>x.id===id);
+        if (a) showAchToast(a.ico+' '+a.name, a.desc);
+        renderAchs();
+      }
+    }
+  }
+}
+
+function renderAchs() {
+  const earned = ACHIEVEMENTS.filter(a=>earnedAchs.has(a.id));
+  const locked = ACHIEVEMENTS.filter(a=>!earnedAchs.has(a.id));
+  document.getElementById('ach-summary').textContent = earned.length + ' / ' + ACHIEVEMENTS.length + ' badges earned · ' + xp + ' total XP';
+  document.getElementById('ach-grid').innerHTML =
+    earned.map(a=>`<div class="ach-card earned"><div class="ach-ico">${a.ico}</div><h4>${a.name}</h4><p>${a.secret?'???':a.desc}</p><div class="ach-earned-tag">✓ Earned</div></div>`).join('') +
+    locked.map(a=>`<div class="ach-card locked-ach"><div class="ach-ico">${a.ico}</div><h4>${a.name}</h4><p>${a.secret?'Secret badge — keep exploring!':a.desc}</p></div>`).join('');
+}
+
+// ==================== STAGES & CHALLENGES ====================
+let completedChallenges = new Set();
+
+const STAGES = [
+{
+  id:1, name:'AI Basics', ico:'🌱', req:0,
+  desc:'Start your AI journey — no experience needed!',
+  challenges:[
+    {id:'s1q1', type:'quiz', title:'What is AI?', desc:'Test your knowledge of what AI actually is.',
+     xp:20, q:'Which of these is the BEST description of Artificial Intelligence?',
+     opts:['A robot that looks like a human','Computer systems that learn from data and perform tasks that normally need human intelligence','A calculator that is very fast','The internet'],
+     ans:1, exp:'AI is about learning and problem-solving — not just speed! It is about machines that can adapt and improve from experience.'},
+    {id:'s1q2', type:'quiz', title:'AI in Daily Life', desc:'Spot AI in the apps you already use.',
+     xp:20, q:'Which of these everyday apps does NOT primarily use AI?',
+     opts:['Spotify recommendations','TikTok For You page','A basic alarm clock','Google Maps traffic'],
+     ans:2, exp:'A basic alarm clock just counts time — no learning, no patterns. Everything else uses AI to personalize your experience!'},
+    {id:'s1p1', type:'prompt', title:'Your First Prompt', desc:'Write a prompt asking AI to explain something you are curious about.',
+     xp:30, task:'Write a prompt that asks the AI to explain any topic you choose — but make the prompt specific! Include: WHO the explanation is for, WHAT format you want, and HOW LONG it should be.'},
+    {id:'s1q3', type:'quiz', title:'Types of ML', desc:'Learn the three main flavors of machine learning.',
+     xp:25, q:'AlphaGo learned to play Go by playing millions of games against itself and earning rewards. What type of learning is this?',
+     opts:['Supervised Learning','Unsupervised Learning','Reinforcement Learning','Memorization Learning'],
+     ans:2, exp:'Reinforcement Learning! The AI gets "rewards" for winning moves and "penalties" for losing — just like earning points in a game.'},
+    {id:'s1p2', type:'prompt', title:'Role-Play a Teacher', desc:'Use the "give AI a role" technique.',
+     xp:35, task:'Write a prompt using the format: "You are a [ROLE]. Explain [TOPIC] to [AUDIENCE] using [THEME] analogies." Fill in all four parts with your own choices and make it fun!'},
+  ]
+},
+{
+  id:2, name:'How AI Thinks', ico:'🧠', req:2,
+  desc:'Dive deeper — neural networks, training, and how AI actually learns.',
+  challenges:[
+    {id:'s2q1', type:'quiz', title:'Neural Net Layers', desc:'Understanding how neural networks are structured.',
+     xp:30, q:'In a neural network, what are the layers BETWEEN the input and output layers called?',
+     opts:['Secret layers','Hidden layers','Middle layers','Processing layers'],
+     ans:1, exp:'Hidden layers! They are called "hidden" because they are not directly visible in the input or output — they do the internal heavy lifting of finding patterns.'},
+    {id:'s2q2', type:'quiz', title:'Training Data', desc:'Why data is the fuel for AI.',
+     xp:30, q:'An AI spam filter was trained only on spam emails written in English. What will probably happen when it sees spam in Spanish?',
+     opts:['It will block it perfectly','It will likely miss it or make errors','It will translate and then block it','Nothing — language does not matter'],
+     ans:1, exp:'This is a classic overfitting/data bias problem! The AI only learned English spam patterns. This is exactly why diverse training data matters so much in AI ethics.'},
+    {id:'s2p1', type:'prompt', title:'Chain of Thought', desc:'Use "think step by step" to get smarter AI answers.',
+     xp:40, task:'Write a prompt that includes the phrase "think step by step" and asks AI to solve a real problem or make a decision. The problem should have at least 3 factors to consider.'},
+    {id:'s2q3', type:'quiz', title:'Overfitting', desc:'The sneaky problem that makes AI dumb.',
+     xp:35, q:'An AI gets 100% on its training data but only 50% on new data. What is this called?',
+     opts:['Perfect performance','Overfitting','Underfitting','Superlearning'],
+     ans:1, exp:'Overfitting! The AI memorized the training examples instead of learning the underlying patterns. It is like a student who memorizes answers without understanding the concepts.'},
+    {id:'s2p2', type:'prompt', title:'Few-Shot Prompting', desc:'Teach AI by giving it examples first.',
+     xp:45, task:'Write a few-shot prompt: Give AI 2 examples of what you want, then ask it to produce 3 more. Your examples should clearly show a pattern (style, format, topic).'},
+  ]
+},
+{
+  id:3, name:'AI Superpowers', ico:'⚡', req:4,
+  desc:'NLP, Computer Vision, and Generative AI — the coolest stuff!',
+  challenges:[
+    {id:'s3q1', type:'quiz', title:'NLP Basics', desc:'How AI understands human language.',
+     xp:40, q:'The sentence "I saw her duck" is famously ambiguous. This is a challenge for which type of AI?',
+     opts:['Computer Vision','Natural Language Processing','Reinforcement Learning','Robotics'],
+     ans:1, exp:'NLP! "Duck" could be a bird or the action of ducking. "Her" is also ambiguous. Natural Language Processing must resolve these ambiguities using context — just like humans do.'},
+    {id:'s3q2', type:'quiz', title:'Computer Vision', desc:'How machines learn to see.',
+     xp:40, q:'A self-driving car must recognize a stop sign covered 30% by snow. Which is most important for handling this?',
+     opts:['Having the fastest CPU','Training on diverse real-world data including partial obstructions','Using a bigger camera','Driving slower'],
+     ans:1, exp:'Training data diversity is key! If the AI never saw partially-covered signs during training, it will fail. This is why autonomous vehicle companies collect millions of miles of real-world data.'},
+    {id:'s3p1', type:'prompt', title:'Constraint Master', desc:'Use rules and constraints to control AI output precisely.',
+     xp:50, task:'Write a "constraint prompt" with at least 4 specific rules the AI must follow. Example rules: word count, sentence count, must include specific words, forbidden words, tone, format. Make something creative!'},
+    {id:'s3q3', type:'quiz', title:'Generative AI', desc:'How AI creates new content.',
+     xp:45, q:'Generative AI like DALL-E creates images by...',
+     opts:['Searching the internet for matching images','Learning statistical patterns from millions of images and generating new pixels that match your description','Taking screenshots','Combining existing photos'],
+     ans:1, exp:'Generative AI learns patterns — shapes, textures, styles, relationships — and generates completely NEW pixels that match your description. It does not search or copy existing images!'},
+    {id:'s3p2', type:'prompt', title:'Creative Director', desc:'Use AI as a creative tool with precise direction.',
+     xp:55, task:'Write a prompt that directs AI to create something creative (a story, poem, product idea, game concept). Include: the creative form, the audience, the tone, 3 specific elements it must include, and one constraint.'},
+  ]
+},
+{
+  id:4, name:'AI Ethics & Society', ico:'⚖️', req:6,
+  desc:'The hard questions — bias, fairness, privacy, and the future.',
+  challenges:[
+    {id:'s4q1', type:'quiz', title:'Bias Detection', desc:'Spotting unfairness in AI systems.',
+     xp:50, q:'A bank uses AI to approve loans. The AI was trained on 30 years of historical loan data from a time when certain groups were systematically denied loans. What is the risk?',
+     opts:['The AI will be very accurate','The AI may perpetuate historical discrimination','Historical data always makes AI better','There is no risk — data is neutral'],
+     ans:1, exp:'This is a real problem! If the training data reflects historical discrimination, the AI learns to discriminate too. AI is only as fair as the data it learns from. This exact scenario has happened with real credit-scoring algorithms.'},
+    {id:'s4q2', type:'quiz', title:'AI Hallucination', desc:'When AI confidently makes things up.',
+     xp:50, q:'A student asks an AI to write a history essay and the AI invents a fake historical quote, citing a real professor. This is called AI...',
+     opts:['Creativity','Hallucination','Improvisation','Summarization'],
+     ans:1, exp:'Hallucination! AI language models predict likely words — sometimes producing convincing-sounding but completely false information. Always verify AI-generated facts, especially citations and quotes!'},
+    {id:'s4p1', type:'prompt', title:'Ethical Lens', desc:'Use AI to analyze something from multiple ethical angles.',
+     xp:60, task:'Write a prompt asking AI to analyze an AI use case from FOUR ethical perspectives: fairness, privacy, safety, and transparency. Choose a real AI application (facial recognition, hiring AI, medical diagnosis AI, etc.)'},
+    {id:'s4q3', type:'quiz', title:'Privacy & AI', desc:'What AI systems know about you.',
+     xp:55, q:'A fitness app uses your health data to train its AI recommendation system. You later delete your account. What is the most likely outcome?',
+     opts:['All your data is immediately deleted from the AI model','The AI model likely already learned patterns from your data and those are not easily removed','The app is legally required to retrain from scratch','Your data was never used'],
+     ans:1, exp:'This is a major privacy challenge called "the right to be forgotten." Once your data trains an AI model, those patterns are embedded across billions of parameters — you cannot easily "untrain" them. This drives real AI privacy legislation.'},
+    {id:'s4p2', type:'prompt', title:'Policy Maker', desc:'Roleplay as an AI policy expert.',
+     xp:65, task:'Roleplay prompt: You are a 13-year-old AI policy advisor presenting to the UN. Write a prompt asking AI (as you) to give a 5-point plan for making AI safer and fairer. Be specific about which AI risks each point addresses.'},
+  ]
+},
+{
+  id:5, name:'Prompt Master', ico:'🧙', req:8,
+  desc:'Advanced prompt engineering — build, evaluate, and optimize prompts like a pro.',
+  challenges:[
+    {id:'s5q1', type:'quiz', title:'Prompt Anatomy', desc:'The key components of a world-class prompt.',
+     xp:60, q:'Which prompt will get the BEST output from an AI writing assistant?',
+     opts:['Write me a poem','Write a 12-line rhyming poem about climate change, from the perspective of a polar bear, in the style of spoken word poetry, for a school assembly audience of 12-year-olds.','Make a good poem','Poem about nature please'],
+     ans:1, exp:'The second prompt wins because it specifies length, topic, perspective, style, and audience. Every detail you add is a constraint that steers the AI toward exactly what you need.'},
+    {id:'s5q2', type:'quiz', title:'System Prompts', desc:'How developers program AI behavior.',
+     xp:60, q:'Developers use "system prompts" to customize AI behavior. What is a system prompt?',
+     opts:['The first message a user sends','Instructions given to the AI before the conversation starts that set its personality, rules, and context','A special computer command','The AI\'s memory of past conversations'],
+     ans:1, exp:'System prompts! They are like setting the rules of a game before you start playing. When you use Claude in AI Academy, there is a hidden system prompt telling it to be a friendly 8th-grade tutor. You can write system prompts too!'},
+    {id:'s5p1', type:'prompt', title:'System Prompt Architect', desc:'Write a system prompt for your own AI assistant.',
+     xp:80, task:'Design a system prompt for a specialized AI assistant of your choice. Include: personality, expertise area, tone/style, what it should and should not do, and how it should respond to questions outside its area. Make it detailed and specific!'},
+    {id:'s5p2', type:'prompt', title:'Prompt Optimizer', desc:'Take a bad prompt and make it great.',
+     xp:80, task:'Start with this weak prompt: "Help me study for my test." Now write an optimized version using ALL 5 golden rules: specific, role-play, formatted output, examples, and chain-of-thought. Show both versions side by side.'},
+    {id:'s5p3', type:'prompt', title:'Meta Prompt', desc:'Write a prompt that generates prompts!',
+     xp:100, task:'Write a "meta prompt" — a prompt that tells AI to generate 5 excellent prompts for a specific subject. Include what topic the prompts should cover, what skill level they target, and what format each generated prompt should follow.'},
+  ]
+}
+];
+
+let currentStage = 0;
+
+function stageUnlocked(idx) {
+  if (idx === 0) return true;
+  const prev = STAGES[idx-1];
+  const done = prev.challenges.filter(c=>completedChallenges.has(c.id)).length;
+  return done >= prev.req;
+}
+
+function buildStageChips() {
+  document.getElementById('stage-chips').innerHTML = STAGES.map((s,i)=>{
+    const unlocked = stageUnlocked(i);
+    const allDone = s.challenges.every(c=>completedChallenges.has(c.id));
+    const doneCnt = s.challenges.filter(c=>completedChallenges.has(c.id)).length;
+    const stars = '★'.repeat(doneCnt) + '☆'.repeat(s.challenges.length-doneCnt);
+    return `<button class="stage-chip ${i===currentStage?'active':''} ${allDone?'done':''} ${!unlocked?'locked-stage':''}"
+      onclick="${unlocked?'selectStage('+i+')':'showLockedMsg('+i+')'}" >
+      <span class="chip-ico">${s.ico}</span>
+      <span>Stage ${s.id}: ${s.name}</span>
+      <span class="chip-stars">${stars}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectStage(idx) {
+  currentStage = idx;
+  buildStageChips();
+  renderStage();
+}
+
+function showLockedMsg(idx) {
+  const prev = STAGES[idx-1];
+  const need = prev.req;
+  const done = prev.challenges.filter(c=>completedChallenges.has(c.id)).length;
+  document.getElementById('game-body').innerHTML = `<div class="stage-locked-msg">
+    <div class="lock-big">🔒</div>
+    <h3>Stage ${idx+1} Locked</h3>
+    <p>Complete ${need} challenges in <strong>${prev.name}</strong> to unlock.<br>You have done ${done} / ${need} so far. Keep going!</p>
+  </div>`;
+}
+
+function renderStage() {
+  const s = STAGES[currentStage];
+  const doneCnt = s.challenges.filter(c=>completedChallenges.has(c.id)).length;
+  document.getElementById('game-body').innerHTML = `
+    <div class="stage-header">
+      <h2>${s.ico} Stage ${s.id}: ${s.name}</h2>
+      <p>${s.desc} &nbsp;·&nbsp; ${doneCnt}/${s.challenges.length} complete</p>
+    </div>
+    <div class="challenge-grid">${s.challenges.map(ch=>`
+      <div class="chall-card ${completedChallenges.has(ch.id)?'done-card':''}" onclick="openChallenge('${ch.id}')">
+        <div class="ch-type ${ch.type}-t">${ch.type==='quiz'?'⚡ Quick Quiz':ch.type==='prompt'?'✍️ Prompt Challenge':'🎨 Design'}</div>
+        ${completedChallenges.has(ch.id)?`<div class="ch-done-badge">✓ Done</div>`:`<div class="ch-xp">+${ch.xp} XP</div>`}
+        <h3>${ch.title}</h3>
+        <p>${ch.desc}</p>
+      </div>`).join('')}
+    </div>`;
+}
+
+function openChallenge(cid) {
+  const ch = STAGES.flatMap(s=>s.challenges).find(c=>c.id===cid);
+  if (!ch) return;
+  const done = completedChallenges.has(cid);
+  const overlay = document.getElementById('ch-overlay');
+  const modal = document.getElementById('ch-modal');
+  if (ch.type === 'quiz') {
+    modal.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+      <div class="ch-type ${ch.type}-t" style="margin-bottom:8px">⚡ Quick Quiz · +${ch.xp} XP</div>
+      <h2>${ch.title}</h2>
+      <div class="ch-desc">${ch.desc}</div>
+      <p style="font-size:.88rem;color:var(--text);margin-bottom:12px;font-weight:600">${ch.q}</p>
+      <div>${ch.opts.map((o,i)=>`<button class="cq-opt ${done?'':''}${done&&i===ch.ans?' cq-correct':''}" id="cqo${cid}${i}" onclick="ansChallQuiz('${cid}',${i})" ${done?'disabled':''}>${o}</button>`).join('')}</div>
+      <div class="cq-feedback" id="cqf${cid}" ${done?'style="display:block"':''}>${done?'✓ Already completed! '+ch.exp:ch.exp}</div>`;
+  } else {
+    modal.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+      <div class="ch-type ${ch.type}-t" style="margin-bottom:8px">✍️ Prompt Challenge · +${ch.xp} XP</div>
+      <h2>${ch.title}</h2>
+      <div class="ch-desc">${ch.desc}</div>
+      <p style="font-size:.83rem;color:var(--dim);margin-bottom:12px;line-height:1.5;padding:10px;background:var(--bg);border-radius:8px;border-left:3px solid var(--purple)"><strong>Your task:</strong> ${ch.task}</p>
+      <textarea class="prompt-input" id="pi${cid}" rows="4" placeholder="Write your prompt here..." ${done?'disabled':''}>${done?'✓ Completed!':''}</textarea>
+      <button class="eval-btn" id="eval-btn-${cid}" onclick="evalPrompt('${cid}')" ${done?'disabled':''}>
+        ${done?'✓ Completed':'🧠 Evaluate with AI'}
+      </button>
+      <div class="eval-result" id="er${cid}"></div>`;
+  }
+  overlay.style.display = 'flex';
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('ch-overlay')) {
+    document.getElementById('ch-overlay').style.display = 'none';
+  }
+}
+
+function ansChallQuiz(cid, chosen) {
+  const ch = STAGES.flatMap(s=>s.challenges).find(c=>c.id===cid);
+  if (!ch || completedChallenges.has(cid)) return;
+  ch.opts.forEach((_,i)=>{
+    const b = document.getElementById('cqo'+cid+i);
+    if (b) { b.disabled=true; if(i===ch.ans) b.classList.add('cq-correct'); else if(i===chosen&&ch.ans!==chosen) b.classList.add('cq-wrong'); }
+  });
+  const fb = document.getElementById('cqf'+cid);
+  if (fb) { fb.style.display='block'; fb.textContent = (chosen===ch.ans?'✓ Correct! ':'✗ Not quite — ')+ch.exp; }
+  if (chosen === ch.ans) {
+    completedChallenges.add(cid);
+    addXP(ch.xp, ch.title);
+    achProgress.quiz_correct++;
+    achProgress.quiz_answered++;
+    checkAchievements();
+    setTimeout(()=>{ closeModal(); renderStage(); buildStageChips(); }, 1800);
+  } else {
+    achProgress.quiz_answered++;
+    checkAchievements();
+  }
+  saveProgress();
+}
+
+async function evalPrompt(cid) {
+  const ch = STAGES.flatMap(s=>s.challenges).find(c=>c.id===cid);
+  if (!ch) return;
+  const input = document.getElementById('pi'+cid);
+  const userPrompt = input ? input.value.trim() : '';
+  if (!userPrompt || userPrompt.length < 15) { alert('Write a longer prompt first! (at least 15 characters)'); return; }
+  const btn = document.getElementById('eval-btn-'+cid);
+  const result = document.getElementById('er'+cid);
+  btn.disabled = true; btn.textContent = '⏳ Evaluating...'; result.style.display='block'; result.textContent='Asking Claude to evaluate your prompt...';
+  const evalPromptText = `A student is doing a prompt engineering exercise. Their task was:
+"${ch.task}"
+
+They wrote this prompt:
+"${userPrompt}"
+
+Evaluate their prompt as a friendly AI teacher for an 8th grader. Score it 1-10 and give:
+1. A score line: SCORE: X/10
+2. What they did well (1-2 things, be specific and encouraging)
+3. One improvement suggestion (specific, actionable)
+4. A "power tip" — one advanced technique they could add
+
+Keep it under 120 words total. Be enthusiastic and encouraging!`;
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400,
+        messages:[{role:'user',content:evalPromptText}] })
+    });
+    const data = await resp.json();
+    const reply = data.content[0].text;
+    const scoreMatch = reply.match(/SCORE:\s*(\d+)/i);
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : 7;
+    const cls = score >= 8 ? 'score-great' : score >= 5 ? 'score-ok' : 'score-low';
+    const formatted = reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    result.innerHTML = `<div class="score-ring ${cls}">Score: ${score}/10</div><br>${formatted}`;
+    if (!completedChallenges.has(cid) && score >= 5) {
+      completedChallenges.add(cid);
+      addXP(ch.xp, ch.title);
+      btn.textContent = '✓ Completed!';
+      setTimeout(()=>{ renderStage(); buildStageChips(); }, 800);
+    } else {
+      btn.disabled = false; btn.textContent = '🔄 Try Again';
+    }
+  } catch(e) {
+    result.textContent = '⚠️ Could not connect. Try again!';
+    btn.disabled = false; btn.textContent = '🧠 Evaluate with AI';
+  }
+  saveProgress();
+}
+
+// ==================== CONCEPTS ====================
+const CONCEPTS = {
+  ai:{icon:'🤖',title:'What is AI?',body:['<strong>AI = Artificial Intelligence</strong> — building computers that can do tasks requiring human-like intelligence: recognize faces, translate languages, beat world champions at chess, or write creative stories.','AI is math + data. Engineers feed computers millions of examples, and the computer discovers patterns on its own without being told every rule.','AI is already everywhere: Siri, TikTok\'s For You page, Google Maps, spam filters, Netflix recommendations — all powered by AI!'],analogy:'🎯 Training a dog: show it "sit" hundreds of times, give treats for doing it right, and it learns. AI works exactly the same way — millions of examples, rewards for correct answers, and it gets better and better.'},
+  ml:{icon:'📈',title:'Machine Learning',body:['<strong>ML</strong> lets computers learn from data instead of following hand-coded rules for every situation.','3 main types: <strong>Supervised Learning</strong> (labeled examples), <strong>Unsupervised Learning</strong> (finds patterns alone), <strong>Reinforcement Learning</strong> (trial + reward).','Example: A spam filter reads thousands of labeled spam emails, learns their patterns, and can identify NEW spam it has never seen!'],analogy:'📚 Studying for a test with 10,000 practice problems instead of memorizing rules — that is what ML does. It practices until the patterns become second nature.'},
+  nn:{icon:'🕸️',title:'Neural Networks',body:['Inspired by the human brain (~86 billion neurons). Neural networks use layers of connected math nodes that pass signals to each other.','Architecture: input layer → hidden layers (many!) → output layer. More layers = "deeper" = can find more complex patterns.','<strong>Deep Learning</strong> = deep neural networks. Powers image recognition, speech recognition, language models, and AI art generation.'],analogy:'💡 Imagine a telephone game with 1,000 people, but each person is doing a tiny math calculation. Input goes in one end, each person adjusts it slightly, and by the end — the AI knows if it is a cat or a dog.'},
+  nlp:{icon:'💬',title:'Natural Language Processing',body:['<strong>NLP</strong> = getting computers to understand and generate human language. English, Spanish, code, emoji — all of it.','Powers: chatbots (hi! 👋), translation apps, voice assistants (Siri, Alexa), autocorrect, and tools like ChatGPT and Claude.','Why it is hard: "I saw a bat flying" vs "I saw a bat on the field" — same words, totally different meanings. Human language is full of ambiguity!'],analogy:'🗣️ Imagine explaining every English grammar rule to an alien — impossible! NLP is like giving the alien every book, website, and conversation ever written, and letting patterns emerge naturally.'},
+  cv:{icon:'👁️',title:'Computer Vision',body:['<strong>CV</strong> teaches machines to see — to look at images/video and understand what is in them, where things are, and what is happening.','Uses: face unlock on your phone, self-driving car pedestrian detection, TikTok filters, medical imaging AI that detects cancer.','It works by breaking images into pixels and finding patterns across millions of training images — learning what makes a face look like a face.'],analogy:'📷 Like how a newborn learns faces — constant exposure to thousands of examples until the brain automatically recognizes patterns. CV does this with millions of labeled images in hours.'},
+  rl:{icon:'🎮',title:'Reinforcement Learning',body:['<strong>RL</strong> = AI that learns by doing. It tries actions, gets rewards for good ones and penalties for bad ones. Repeat millions of times.','The key components: Agent (the AI), Environment (the world), Actions, Rewards/Penalties, Policy (strategy it develops).','AlphaZero learned chess, Go, and shogi from scratch — zero human games — and became the best player in history at all three games in hours.'],analogy:'🎮 Your first time playing a new video game: you mash buttons, fall off cliffs (bad!), find coins (good!). After enough playthroughs you master it. RL is this — but millions of playthroughs in seconds.'},
+  ethics:{icon:'⚖️',title:'AI Ethics',body:['AI is only as fair as its training data. A hiring AI trained mostly on male engineer resumes learned to rank women lower — this actually happened at a major tech company.','Key principles: <strong>Fairness</strong> (no discrimination), <strong>Transparency</strong> (explain decisions), <strong>Privacy</strong> (protect data), <strong>Safety</strong> (prevent harm), <strong>Accountability</strong> (humans stay in control).','As AI becomes more powerful, getting these principles right matters more than almost anything else in tech.'],analogy:'⚖️ A super-powered robot friend: incredible to have, but you would want to make sure it has good values, does not lie, treats everyone fairly, and has an off switch if something goes wrong.'},
+  llm:{icon:'🧬',title:'Large Language Models',body:['<strong>LLMs</strong> are the tech behind ChatGPT, Claude, Gemini, and more. Trained on enormous text — predicting "what word comes next" billions of times.','They have billions or <strong>trillions of parameters</strong> (numbers learned during training). GPT-4 is estimated to have ~1.8 trillion.','They can write, reason, translate, code, summarize, explain, and hold conversations — all from one unified architecture built around language prediction.'],analogy:'🧬 Imagine reading every book, article, website, and conversation ever written — then getting so good at language patterns that you can finish any sentence perfectly. Scale that to a trillion data points and you get an LLM.'},
+  gen:{icon:'🎨',title:'Generative AI',body:['<strong>Generative AI</strong> creates new content: text, images, music, video, code, 3D models — things that did not exist before.','How image AI works: it learns statistical patterns from millions of images (colors, shapes, styles, relationships), then generates new pixels that match your description.','Examples: DALL-E, Midjourney, Stable Diffusion (images), Sora (video), Claude/ChatGPT (text), Suno/Udio (music), GitHub Copilot (code).'],analogy:'🎨 Like a musician who has heard thousands of songs and can now compose a new one in any style. Gen AI has seen millions of images/texts/sounds and generates new ones by remixing learned patterns — nothing is copied, everything is new.'},
+  pe:{icon:'✍️',title:'Prompt Engineering',body:['A <strong>prompt</strong> is what you type to an AI. Prompt engineering is the skill of writing prompts that get amazing results — the same AI gives wildly different answers depending on how you ask.','Key techniques: being specific, giving the AI a role, specifying format, providing examples (few-shot), adding constraints, using chain-of-thought ("think step by step").','It is one of the hottest new skills in tech. Companies pay six-figure salaries for expert prompt engineers!'],analogy:'✍️ Like being a movie director: a bad director says "action!" and hopes for the best. A great director gives actors motivation, context, tone, examples, and precise direction — and gets Oscar-worthy results from the same cast.'},
+};
+
+function expandConcept(k) {
+  const c = CONCEPTS[k], el = document.getElementById('cdetail');
+  el.innerHTML = `<h2>${c.icon} ${c.title}</h2>${c.body.map(b=>`<p>${b}</p>`).join('')}<div class="analogy">${c.analogy}</div><button class="close-btn" onclick="document.getElementById('cdetail').style.display='none'">✕ Close</button>`;
+  el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  achProgress.concept_opens.add(k);
+  addXP(5, 'Concept explored');
+  checkAchievements();
+}
+
+// ==================== QUIZ ====================
+const QUIZ=[
+  {q:"What does AI stand for?",o:["Automatic Internet","Artificial Intelligence","Advanced Information","Animated Input"],a:1,e:"AI = Artificial Intelligence — computers designed to learn from data and perform tasks that normally need human intelligence."},
+  {q:"Which ML type learns by trial and reward — like training a dog?",o:["Supervised Learning","Unsupervised Learning","Reinforcement Learning","Deep Learning"],a:2,e:"Reinforcement Learning! The AI tries actions, gets rewards for correct ones, penalties for bad ones — and learns the winning strategy over millions of tries."},
+  {q:"What is a neural network inspired by?",o:["The internet","A calculator","The human brain","A robot"],a:2,e:"The human brain! Neural networks mimic how neurons connect and pass signals to each other — but using math instead of biology."},
+  {q:"Which AI technology lets your phone understand voice commands?",o:["Computer Vision","Natural Language Processing","Reinforcement Learning","Data Mining"],a:1,e:"NLP — Natural Language Processing! It lets AI understand and generate human language, powering Siri, Google Assistant, and chatbots."},
+  {q:"Self-driving cars use which AI to 'see' the road?",o:["NLP","Reinforcement Learning","Computer Vision","Fuzzy Logic"],a:2,e:"Computer Vision! Cars process camera and sensor data in real-time to recognize lanes, signs, pedestrians, and other vehicles."},
+  {q:"If AI is trained mostly on data from one group of people, it might be...",o:["More accurate","Biased","Faster","Cheaper"],a:1,e:"Biased! If training data is unbalanced, the AI learns unfair patterns. This is why AI ethics and diverse data matter so much."},
+  {q:"What are the middle layers in a neural network called?",o:["Hidden layers","Data clouds","Memory banks","Pixel grids"],a:0,e:"Hidden layers! They find increasingly complex patterns between input and output — invisible to the user but doing all the hard work."},
+  {q:"When AI confidently states something false, this is called...",o:["Overfitting","Bias","Hallucination","Dropout"],a:2,e:"Hallucination! LLMs sometimes generate plausible-sounding but completely false information. Always verify AI-generated facts!"},
+  {q:"Which technique makes AI answers more logical and accurate?",o:["Asking shorter questions","Adding 'think step by step' to your prompt","Using all capitals","Asking in a different language"],a:1,e:"Chain-of-thought prompting! Adding 'think step by step' gives the AI space to reason through problems instead of jumping to conclusions."},
+  {q:"What is a 'few-shot prompt'?",o:["A very short prompt","A prompt with examples showing what you want before asking","A prompt written fast","A prompt for small tasks"],a:1,e:"Few-shot prompting! You give 2-3 examples of the pattern or style you want, THEN ask your question. It dramatically improves output quality."},
+];
+let qScore={c:0,t:0},qAnswered={};
+function buildQuiz(){
+  document.getElementById('quiz-questions').innerHTML=QUIZ.map((q,i)=>`
+    <div class="qcard"><div class="qtag">Question ${i+1} of ${QUIZ.length}</div>
+    <h3>${q.q}</h3>
+    <div class="qopts">${q.o.map((o,j)=>`<button class="qopt" id="qo${i}${j}" onclick="answerQ(${i},${j})">${o}</button>`).join('')}</div>
+    <div class="qexp" id="qe${i}">${q.e}</div></div>`).join('');
+}
+function answerQ(qi,ci){
+  if(qAnswered[qi])return;
+  qAnswered[qi]=true;qScore.t++;
+  const q=QUIZ[qi];
+  if(q.a===ci){qScore.c++;addXP(15,'Quiz correct');}
+  achProgress.quiz_answered++;
+  if(q.a===ci)achProgress.quiz_correct++;
+  q.o.forEach((_,j)=>{
+    const b=document.getElementById('qo'+qi+j);b.disabled=true;
+    if(j===q.a)b.classList.add('correct');
+    else if(j===ci&&q.a!==ci)b.classList.add('wrong');
+  });
+  document.getElementById('qe'+qi).style.display='block';
+  document.getElementById('prog').style.width=(qScore.t/QUIZ.length*100)+'%';
+  const badge=document.getElementById('scorebadge');
+  badge.textContent=`${qScore.c} / ${qScore.t} correct`;
+  if(qScore.t===QUIZ.length)badge.textContent+=qScore.c===QUIZ.length?' 🏆 Perfect!':' 🎉 Done!';
+  checkAchievements();
+}
+
+// ==================== GLOSSARY ====================
+const GLOSSARY=[
+  {t:"Algorithm",tag:"Core",d:"A step-by-step set of rules a computer follows to solve a problem or make a decision."},
+  {t:"Training Data",tag:"ML",d:"The examples fed to an AI so it can learn patterns. More good data = smarter, fairer AI!"},
+  {t:"Model",tag:"ML",d:"The AI 'brain' that develops after training — the set of patterns it learned to make predictions."},
+  {t:"Bias (AI)",tag:"Ethics",d:"When AI gives unfair results because its training data was incomplete, unbalanced, or reflected historical discrimination."},
+  {t:"Deep Learning",tag:"ML",d:"Machine learning using neural networks with many layers — excels at images, audio, language, and video."},
+  {t:"Overfitting",tag:"ML",d:"When AI memorizes training examples but fails on new data — like studying practice test answers instead of understanding the concepts."},
+  {t:"Parameter",tag:"Neural Net",d:"An adjustable number inside a neural network. Models can have billions or trillions — GPT-4 is estimated at 1.8 trillion!"},
+  {t:"Prompt",tag:"NLP",d:"The text or question you give an AI. 'Prompt engineering' is the art of writing prompts that get amazing results."},
+  {t:"Hallucination",tag:"NLP",d:"When AI confidently states something that is factually wrong — a major challenge researchers are actively working to solve."},
+  {t:"Label",tag:"ML",d:"The 'answer' tag attached to training data — like marking photos of cats with the label 'cat' so the AI knows what it is seeing."},
+  {t:"Dataset",tag:"ML",d:"A collection of organized data used to train or test an AI model. Quality and diversity matter more than size alone."},
+  {t:"Epoch",tag:"ML",d:"One full pass through all training data. Models train over many epochs, gradually improving with each pass."},
+  {t:"Token",tag:"NLP",d:"A chunk of text (roughly a word or part of a word) that language models process one at a time. Claude can process up to 200K tokens at once!"},
+  {t:"Inference",tag:"ML",d:"When a trained model runs and makes predictions — as opposed to the training phase where it learns."},
+  {t:"Gradient Descent",tag:"ML",d:"The math optimization process AI uses to slowly improve by adjusting parameters to reduce prediction errors."},
+  {t:"Few-Shot Prompting",tag:"PE",d:"A prompting technique where you give 2-3 examples of what you want before asking your question. Dramatically improves output quality."},
+  {t:"Chain-of-Thought",tag:"PE",d:"Adding 'think step by step' to prompts — gives AI space to reason carefully instead of jumping to conclusions. Improves accuracy significantly."},
+  {t:"System Prompt",tag:"PE",d:"Hidden instructions given to an AI before a conversation starts — setting its personality, rules, and expertise area."},
+  {t:"Zero-Shot Prompting",tag:"PE",d:"Asking AI to do something with no examples — just a clear instruction. Works well for simple tasks."},
+  {t:"LLM",tag:"NLP",d:"Large Language Model — a massive AI trained on text to understand and generate human language (e.g. Claude, GPT-4, Gemini)."},
+  {t:"Reinforcement Learning",tag:"ML",d:"AI that learns by trying things, getting rewards for good actions, and penalties for bad ones — like leveling up in a game."},
+  {t:"Computer Vision",tag:"CV",d:"AI that can see and understand images/video — used in face ID, self-driving cars, medical imaging, and AR filters."},
+  {t:"Generative AI",tag:"AI",d:"AI that creates new content — images, text, music, video, code — by learning patterns from millions of examples."},
+  {t:"Fine-tuning",tag:"ML",d:"Taking a pre-trained AI model and training it further on a specific dataset to specialize it for a particular task."},
+  {t:"Embedding",tag:"NLP",d:"Converting words, images, or other data into numbers (vectors) so AI can mathematically compare and relate concepts."},
+];
+function renderGloss(items){
+  document.getElementById('glist').innerHTML=items.map(g=>`<div class="term"><h4>${g.t}<span class="ttag">${g.tag}</span></h4><p>${g.d}</p></div>`).join('');
+}
+function filterGloss(){
+  const q=document.getElementById('gsrch').value.toLowerCase();
+  renderGloss(GLOSSARY.filter(g=>g.t.toLowerCase().includes(q)||g.d.toLowerCase().includes(q)));
+}
+
+// ==================== PROMPT ENG TAB ====================
+let peLoading = false;
+async function sendPePrompt(){
+  if(peLoading)return;
+  const input=document.getElementById('pe-input');
+  const txt=input.value.trim();
+  if(!txt)return;
+  peLoading=true;
+  const btn=document.getElementById('pe-send-btn');
+  const resp=document.getElementById('pe-response');
+  btn.disabled=true;resp.style.display='block';resp.textContent='⏳ Asking Claude...';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,
+        system:'You are a helpful, enthusiastic AI assistant for 8th grade students. Keep responses clear, engaging, and age-appropriate. Use emojis occasionally. Aim for 100-200 words.',
+        messages:[{role:'user',content:txt}]})
+    });
+    const data=await r.json();
+    const reply=data.content[0].text;
+    resp.innerHTML=reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    addXP(10,'Prompt sent');
+    achProgress.tpl_used.add(txt.slice(0,20));
+    checkAchievements();
+  }catch(e){
+    resp.textContent='⚠️ Connection error. Try again!';
+  }
+  btn.disabled=false;peLoading=false;
+}
+function peLoad(txt){
+  document.getElementById('pe-input').value=txt;
+  switchView('prompts');
+  setTimeout(()=>document.getElementById('pe-input').scrollIntoView({behavior:'smooth'}),100);
+}
+function selectTpl(el,txt){
+  document.querySelectorAll('.tpl-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  if(txt) document.getElementById('pe-input').value=txt;
+  achProgress.tpl_used.add(txt||'custom');
+  checkAchievements();
+}
+
+// ==================== CHAT ====================
+let chatHistory=[], isLoading=false;
+const SYSTEM_PROMPT=`You are Atom, an enthusiastic and friendly AI tutor for 8th graders (age 13-14) in an app called AI Academy.
+
+Teaching style:
+- Simple, clear language — explain jargon immediately when used
+- Genuinely enthusiastic and encouraging — learning AI is COOL!
+- Real-world examples they know: TikTok, Minecraft, Spotify, face unlock, Netflix, YouTube
+- Great analogies to make abstract concepts click
+- Occasional emojis to keep it lively (but not excessive)
+- Responses 150-250 words max unless more is asked for
+- For quiz requests: give ONE multiple choice question, wait for their answer, then reveal
+- Encourage when they get things wrong — explain why the correct answer makes sense
+
+Format: **bold** for key terms, line breaks for readability, bullet lists when helpful.
+Never discuss harmful topics. Stay educational and age-appropriate.`;
+
+async function sendMessage(customText){
+  if(isLoading)return;
+  const input=document.getElementById('input');
+  const text=customText||input.value.trim();
+  if(!text)return;
+  hideWelcome();
+  if(!customText){input.value='';input.style.height='auto';}
+  appendMsg('user',text);
+  chatHistory.push({role:'user',content:text});
+  isLoading=true;document.getElementById('send-btn').disabled=true;
+  const tid=showTyping();
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:SYSTEM_PROMPT,messages:chatHistory})
+    });
+    removeTyping(tid);
+    if(!r.ok)throw new Error('API '+r.status);
+    const data=await r.json();
+    const reply=data.content[0].text;
+    chatHistory.push({role:'assistant',content:reply});
+    appendMsg('ai',reply);
+    achProgress.chat_count++;
+    addXP(8,'Question asked');
+    checkAchievements();
+  }catch(e){
+    removeTyping(tid);
+    appendMsg('ai','⚠️ Trouble connecting. Check internet and try again! ('+e.message+')');
+  }
+  isLoading=false;document.getElementById('send-btn').disabled=false;
+}
+function askTopic(text){switchView('chat');sendMessage(text);}
+function appendMsg(role,text){
+  const msgs=document.getElementById('messages');
+  const div=document.createElement('div');div.className='msg '+role;
+  const ava=document.createElement('div');ava.className='avatar '+role;ava.textContent=role==='ai'?'⚛':'🧑';
+  const bub=document.createElement('div');bub.className='bubble';
+  bub.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`(.*?)`/g,'<code>$1</code>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  div.appendChild(ava);div.appendChild(bub);msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function showTyping(){
+  const msgs=document.getElementById('messages');
+  const id='t'+Date.now();
+  msgs.innerHTML+=`<div class="msg ai" id="${id}"><div class="avatar ai">⚛</div><div class="bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;return id;
+}
+function removeTyping(id){const el=document.getElementById(id);if(el)el.remove();}
+function hideWelcome(){const w=document.getElementById('welcome-screen');if(w)w.remove();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function autoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+
+// ==================== VIEWS ====================
+function switchView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('show'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const el=document.getElementById('view-'+view);
+  if(el)el.classList.add('show');
+  document.querySelectorAll('.tab').forEach(t=>{if(t.dataset.view===view)t.classList.add('active');});
+  document.getElementById('sidebar').style.display=view==='chat'?'block':'none';
+  if(view==='game'){buildStageChips();renderStage();}
+  if(view==='achievements')renderAchs();
+}
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    if(!this.classList.contains('locked'))switchView(this.dataset.view);
+  });
+});
+
+// ==================== SAVE/LOAD ====================
+function saveProgress(){
+  try{
+    localStorage.setItem('aiacademy',JSON.stringify({
+      xp,level,
+      completed:Array.from(completedChallenges),
+      earned:Array.from(earnedAchs),
+      achProg:{chat_count:achProgress.chat_count,concept_opens:Array.from(achProgress.concept_opens),tpl_used:Array.from(achProgress.tpl_used),quiz_correct:achProgress.quiz_correct,quiz_answered:achProgress.quiz_answered}
+    }));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const d=JSON.parse(localStorage.getItem('aiacademy')||'{}');
+    if(d.xp){xp=d.xp;level=d.level||1;completedChallenges=new Set(d.completed||[]);earnedAchs=new Set(d.earned||[]);
+      if(d.achProg){achProgress.chat_count=d.achProg.chat_count||0;achProgress.concept_opens=new Set(d.achProg.concept_opens||[]);achProgress.tpl_used=new Set(d.achProg.tpl_used||[]);achProgress.quiz_correct=d.achProg.quiz_correct||0;achProgress.quiz_answered=d.achProg.quiz_answered||0;}
+    }
+  }catch(e){}
+}
+
+// ==================== INIT ====================
+loadProgress();
+updateXPBar();
+buildQuiz();
+renderGloss(GLOSSARY);
+renderAchs();
+buildStageChips();
+renderStage();
+</script>
+</body>
+</html>
